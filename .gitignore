@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.so
+# ─── Packaging / build ─────────────────────────────────
+build/
+dist/
+*.egg-info/
+# ─── Virtual-envs ──────────────────────────────────────
+.venv/
+venv/
+# ─── Editor / OS clutter ───────────────────────────────
+.DS_Store
+.idea/
+.vscode/
