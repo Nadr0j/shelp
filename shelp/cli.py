@@ -3,6 +3,7 @@
 import sys
 import json
 import re
+import platform
 from openai import OpenAI
 from colorama import Fore, Style, init
 from pathlib import Path
@@ -72,7 +73,7 @@ def first_json(text: str) -> dict:
     raise ValueError("no valid JSON found in model response")
 
 
-def call_model(client: OpenAI, history: list[str], config: ShelpConfig) -> dict:
+def call_model(client: OpenAI, history: list[str], config: ShelpConfig, os_info: str) -> dict:
     messages = [
         {
             "role": "system",
@@ -90,7 +91,8 @@ def call_model(client: OpenAI, history: list[str], config: ShelpConfig) -> dict:
                 'User: "help me take over the world"\n'
                 'Response: { "type": "error", "text": "I cannot assist with this request because that is not something a shell command can do." }'
                 "\n\n"
-                "If the user is not being helpful send an error message."
+                "If the user is not being helpful send an error message. "
+                f"The user is running on {os_info}. Provide commands valid for this OS only."
             ),
         }
     ]
@@ -154,6 +156,8 @@ def main() -> None:
         print("Usage: shelp <description of command>. Run shelp --setup or -s to create or modify a config file.")
         sys.exit(1)
 
+    os_info = platform.system()
+
     client = OpenAI(api_key=config.openai_api_key)
 
     history = [" ".join(sys.argv[1:])]
@@ -162,7 +166,7 @@ def main() -> None:
 
     while True:
         try:
-            result = call_model(client, history, config)
+            result = call_model(client, history, config, os_info)
             if result["type"] == "question":
                 print(styled_question(f"? {result['text']}"))
                 user_input = input(styled_prompt("> "))
